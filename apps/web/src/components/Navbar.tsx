@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import Magnetic from './Magnetic';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,48 +22,92 @@ const Navbar = () => {
     { name: 'Legacy', href: '#about' },
     { name: 'Moments', href: '#gallery' },
     { name: 'Collection', href: '#products' },
-    { name: 'Contact', href: '#contact' },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 h-24 flex items-center z-[1000] transition-all duration-700 ${isScrolled ? 'h-[80px] bg-black/90 backdrop-blur-2xl border-b border-white/5' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-1000 ease-in-out ${isScrolled ? 'py-4 glass' : 'py-10 bg-transparent'}`}>
       <div className="container mx-auto px-8 flex justify-between items-center w-full">
-        <Link href="/" className="group">
-          <img src="/logo.png" alt="LFT Logo" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-500" />
-        </Link>
+        <Magnetic>
+          <Link href="/" className="relative z-10">
+            <img src="/logo.png" alt="LFT Logo" className="w-12 h-12 md:w-16 md:h-16 object-contain" />
+          </Link>
+        </Magnetic>
 
-        <ul className="hidden md:flex gap-12 items-center">
+        <ul className="hidden md:flex gap-16 items-center">
           {navLinks.map((link) => (
             <li key={link.name}>
-              <Link href={link.href} className="text-[11px] font-bold tracking-[3px] uppercase text-muted hover:text-white transition-all hover:tracking-[5px]">
-                {link.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <button 
-          className="md:hidden flex flex-col gap-2 z-[1001] relative p-2"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-500 ${isMobileMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></span>
-          <span className={`block w-8 h-0.5 bg-primary transition-all duration-500 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-500 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></span>
-        </button>
-
-        {/* Mobile Menu */}
-        <div className={`fixed inset-0 bg-black flex flex-col items-center justify-center transition-all duration-700 md:hidden ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'}`}>
-          <ul className="flex flex-col gap-10 text-center">
-            {navLinks.map((link) => (
-              <li key={link.name}>
-                <Link href={link.href} className="text-3xl font-serif italic text-white hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+              <Magnetic>
+                <Link 
+                  href={link.href} 
+                  className="text-[10px] font-medium tracking-[0.4em] uppercase text-muted hover:text-primary transition-colors duration-500"
+                >
                   {link.name}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+              </Magnetic>
+            </li>
+          ))}
+          <li>
+            <Magnetic>
+              <a 
+                href="#contact" 
+                className="bg-primary text-black px-8 py-3 text-[9px] font-bold tracking-[3px] uppercase hover:bg-white transition-all duration-500"
+              >
+                Inquiry
+              </a>
+            </Magnetic>
+          </li>
+        </ul>
+
+        {/* Mobile Toggle */}
+        <button 
+          className="md:hidden z-[1001] relative flex flex-col gap-1.5 p-2"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <motion.span 
+            animate={{ rotate: isMobileMenuOpen ? 45 : 0, y: isMobileMenuOpen ? 8 : 0 }}
+            className="w-8 h-[1px] bg-white"
+          />
+          <motion.span 
+            animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+            className="w-8 h-[1px] bg-primary"
+          />
+          <motion.span 
+            animate={{ rotate: isMobileMenuOpen ? -45 : 0, y: isMobileMenuOpen ? -8 : 0 }}
+            className="w-8 h-[1px] bg-white"
+          />
+        </button>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-0 bg-black z-[1000] flex flex-col items-center justify-center"
+            >
+              <ul className="flex flex-col gap-12 text-center">
+                {navLinks.map((link, i) => (
+                  <motion.li 
+                    key={link.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Link 
+                      href={link.href} 
+                      className="text-4xl font-serif italic text-white hover:text-primary transition-colors" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );
