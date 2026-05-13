@@ -19,6 +19,11 @@ yarn-error.log*
 # Local env files
 .env*.local
 
+# Temporary extraction files
+*.txt
+*.js.map
+original_site.js
+
 # Vercel
 .vercel
 
